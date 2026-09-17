@@ -1,7 +1,7 @@
 module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy("src/css");
+  eleventyConfig.addPassthroughCopy("src/js");
 
-  // Resolve a CURIE tag reference to its tag object, annotated with kind
   eleventyConfig.addFilter("tagById", function (curie, standards) {
     const study = (standards.study_tags || []).find((t) => t.id === curie);
     if (study) return { ...study, kind: "study" };
@@ -10,12 +10,21 @@ module.exports = function (eleventyConfig) {
     return { id: curie, name: curie, kind: "unknown" };
   });
 
-  // Convert a CURIE like "as:reproducible-installation" to a URL-safe slug
+  // Strip CURIE prefix: "as:benchmarking" → "benchmarking"
   eleventyConfig.addFilter("slugify", function (curie) {
     return String(curie)
       .replace(/^[^:]+:/, "")
       .replace(/[^a-z0-9-]/gi, "-")
       .toLowerCase();
+  });
+
+  // Return a JSON string of slugified CURIE IDs — used for data attributes
+  eleventyConfig.addFilter("tagSlugs", function (curies) {
+    return JSON.stringify(
+      (curies || []).map((c) =>
+        String(c).replace(/^[^:]+:/, "").replace(/[^a-z0-9-]/gi, "-").toLowerCase()
+      )
+    );
   });
 
   return {

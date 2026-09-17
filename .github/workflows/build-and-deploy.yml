@@ -22,12 +22,20 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Download latest data.yml from artifact-standards release
+      - name: Download all release data from artifact-standards
         run: |
-          mkdir -p src/_data
-          curl -fsSL \
-            https://github.com/aaronpeikert/artifact-standards/releases/latest/download/data.yml \
-            -o src/_data/standards.yaml
+          mkdir -p src/_data/versions
+          gh api repos/aaronpeikert/artifact-standards/releases \
+            --paginate \
+            --jq '.[].tag_name' | while read -r tag; do
+            echo "Downloading ${tag}..."
+            curl -fsSL \
+              "https://github.com/aaronpeikert/artifact-standards/releases/download/${tag}/data.yml" \
+              -o "src/_data/versions/${tag}.yaml" \
+              || echo "Warning: failed to download ${tag}"
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/setup-node@v7
         with:

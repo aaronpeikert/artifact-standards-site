@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ standards.name or "Research Artifact Standards" }}</title>
+  <title>{% if version %}{{ version.tag }} — {% endif %}Research Artifact Standards</title>
   <meta name="description" content="Principles and implementations for creating and evaluating research artifacts.">
   <link rel="stylesheet" href="{{ '/css/style.css' | url }}">
 </head>
@@ -12,7 +12,21 @@
 
   <header class="site-header">
     <div class="container">
-      <h1 class="site-title">{{ standards.name or "Research Artifact Standards" }}</h1>
+      <div class="site-header__inner">
+        <h1 class="site-title">Research Artifact Standards</h1>
+        {% if versions | length %}
+        <div class="version-switcher">
+          <label for="version-select">Version</label>
+          <select id="version-select" data-base-url="{{ '/' | url }}">
+            {% for v in versions | reverse %}
+            <option value="{{ v.tag }}" {% if version and v.tag == version.tag %}selected{% endif %}>
+              {{ v.tag }}{% if loop.first %} (latest){% endif %}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        {% endif %}
+      </div>
     </div>
   </header>
 
@@ -25,5 +39,7 @@
       <p>Data from <a href="https://github.com/aaronpeikert/artifact-standards">aaronpeikert/artifact-standards</a>.</p>
     </div>
   </footer>
+
+  <script src="{{ '/js/filter.js' | url }}"></script>
 </body>
 </html>

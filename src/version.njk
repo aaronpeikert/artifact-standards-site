@@ -1,0 +1,167 @@
+---
+pagination:
+  data: versions
+  size: 1
+  alias: version
+permalink: "{{ version.tag }}/"
+layout: base.njk
+---
+
+{% set d = version.data %}
+
+{% if d.study_tags or d.artifact_tags %}
+<section class="tag-legend" aria-label="Filter by tag">
+  <h2 class="sr-only">Filter</h2>
+  {% if d.study_tags %}
+  <div class="tag-group">
+    <span class="tag-group-label">Study type</span>
+    {% for tag in d.study_tags %}
+      <button class="tag tag--study"
+        data-filter-type="study"
+        data-filter-id="{{ tag.id | slugify }}"
+        title="{{ tag.description | trim }}">{{ tag.name }}</button>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% if d.artifact_tags %}
+  <div class="tag-group">
+    <span class="tag-group-label">Artifact type</span>
+    {% for tag in d.artifact_tags %}
+      <button class="tag tag--artifact"
+        data-filter-type="artifact"
+        data-filter-id="{{ tag.id | slugify }}"
+        title="{{ tag.description | trim }}">{{ tag.name }}</button>
+    {% endfor %}
+  </div>
+  {% endif %}
+  <p class="filter-status" id="filter-count" aria-live="polite"></p>
+</section>
+{% endif %}
+
+<section aria-label="Principles">
+  {% for principle in d.principles %}
+  <article class="principle-card"
+    id="principle-{{ principle.id | slugify }}"
+    data-study="{{ principle.study_tags | tagSlugs }}"
+    data-artifact="{{ principle.artifact_tags | tagSlugs }}">
+
+    <header class="principle-header">
+      <h2 class="principle-name">
+        <a href="#principle-{{ principle.id | slugify }}" class="anchor-link">{{ principle.name }}</a>
+      </h2>
+      <div class="tag-list" aria-label="Applicable to">
+        {% for curie in (principle.study_tags or []) %}
+          {% set tag = curie | tagById(d) %}
+          <span class="tag tag--study" title="{{ tag.description | trim if tag.description }}">{{ tag.name }}</span>
+        {% endfor %}
+        {% for curie in (principle.artifact_tags or []) %}
+          {% set tag = curie | tagById(d) %}
+          <span class="tag tag--artifact" title="{{ tag.description | trim if tag.description }}">{{ tag.name }}</span>
+        {% endfor %}
+      </div>
+    </header>
+
+    <p class="principle-rationale">{{ principle.rationale | trim }}</p>
+
+    {% if principle.implementations %}
+    <div class="implementations">
+      {% for impl in principle.implementations %}
+      <details class="impl-details" id="impl-{{ impl.id | slugify }}">
+        <summary class="impl-summary">
+          <span class="impl-name">{{ impl.name }}</span>
+          <span class="tag-list" aria-hidden="true">
+            {% for curie in (impl.study_tags or []) %}
+              {% set tag = curie | tagById(d) %}
+              <span class="tag tag--study">{{ tag.name }}</span>
+            {% endfor %}
+            {% for curie in (impl.artifact_tags or []) %}
+              {% set tag = curie | tagById(d) %}
+              <span class="tag tag--artifact">{{ tag.name }}</span>
+            {% endfor %}
+          </span>
+        </summary>
+
+        <div class="impl-body">
+          <p class="impl-rationale">{{ impl.rationale | trim }}</p>
+
+          <section class="guidance-section">
+            <h4>Creation guidance</h4>
+            <p>{{ impl.creation_guidance.description | trim }}</p>
+            {% if impl.creation_guidance.examples %}
+            <ul class="example-list">
+              {% for ex in impl.creation_guidance.examples %}<li>{{ ex }}</li>{% endfor %}
+            </ul>
+            {% endif %}
+          </section>
+
+          {% if impl.checks_guidance.human %}
+          <section class="guidance-section">
+            <h4>Human checks</h4>
+            {% for check in impl.checks_guidance.human %}
+            <div class="check check--human">
+              <p>{{ check.description | trim }}</p>
+              {% if check.evidence %}
+              <ul class="evidence-list">
+                {% for ev in check.evidence %}<li>{{ ev }}</li>{% endfor %}
+              </ul>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </section>
+          {% endif %}
+
+          {% if impl.checks_guidance.automated and impl.checks_guidance.automated.checks %}
+          {% set auto = impl.checks_guidance.automated %}
+          <section class="guidance-section">
+            <h4>Automated checks</h4>
+            {% for check in auto.checks %}
+            <div class="check check--automated" id="check-{{ check.id | slugify }}">
+              <p class="check-description">{{ check.description | trim }}</p>
+              {% if check.inputs %}
+              <div class="table-wrap">
+                <table class="inputs-table">
+                  <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+                  <tbody>
+                  {% for inp in check.inputs %}
+                    <tr>
+                      <td><code>{{ inp.id }}</code></td>
+                      <td>{{ inp.type }}</td>
+                      <td>{% if inp.default %}<code>{{ inp.default }}</code>{% else %}—{% endif %}</td>
+                      <td>{{ inp.description | trim }}</td>
+                    </tr>
+                  {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              {% endif %}
+              <pre class="command-block"><code>{{ check.command | trim }}</code></pre>
+              <p class="expected-result">Expected: {{ check.expected_result | trim }}</p>
+            </div>
+            {% endfor %}
+
+            {% if auto.combination_rules %}
+            <div class="combination-rules">
+              <h5>Combination rules</h5>
+              {% for rule in auto.combination_rules %}
+              <div class="combination-rule">
+                <strong>{{ rule.operator }}</strong>:
+                {% for checkId in rule.checks %}
+                  <a href="#check-{{ checkId | slugify }}"><code>{{ checkId }}</code></a>{% if not loop.last %}, {% endif %}
+                {% endfor %}
+                {% if rule.description %}<p class="rule-description">{{ rule.description | trim }}</p>{% endif %}
+              </div>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </section>
+          {% endif %}
+        </div>
+      </details>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </article>
+  {% endfor %}
+
+  <p class="no-results" id="no-results" hidden>No principles match the current filters.</p>
+</section>
