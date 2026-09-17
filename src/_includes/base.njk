@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ standards.name or "Research Artifact Standards" }}</title>
+  <meta name="description" content="Principles and implementations for creating and evaluating research artifacts.">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="container">
+      <h1 class="site-title">{{ standards.name or "Research Artifact Standards" }}</h1>
+    </div>
+  </header>
+
+  <main id="main" class="container">
+    {{ content | safe }}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>Data from <a href="https://github.com/aaronpeikert/artifact-standards">aaronpeikert/artifact-standards</a>.</p>
+    </div>
+  </footer>
+</body>
+</html>
