@@ -3,14 +3,25 @@ const fs = require("fs");
 const path = require("path");
 
 module.exports = function () {
-  const dir = path.join(__dirname, "versions");
-  if (!fs.existsSync(dir)) return [];
+  const versionsDir = path.join(__dirname, "versions");
+  const venuesDir = path.join(__dirname, "venues");
 
-  return fs.readdirSync(dir)
+  if (!fs.existsSync(versionsDir)) return [];
+
+  return fs.readdirSync(versionsDir)
     .filter((f) => f.endsWith(".yaml"))
     .sort()
-    .map((filename) => ({
-      tag: filename.replace(".yaml", ""),
-      data: yaml.load(fs.readFileSync(path.join(dir, filename), "utf8")) || {},
-    }));
+    .map((filename) => {
+      const tag = filename.replace(".yaml", "");
+      const venueFile = path.join(venuesDir, filename);
+      const venuesData = fs.existsSync(venueFile)
+        ? yaml.load(fs.readFileSync(venueFile, "utf8")) || {}
+        : {};
+
+      return {
+        tag,
+        data: yaml.load(fs.readFileSync(path.join(versionsDir, filename), "utf8")) || {},
+        venues: venuesData.venues || [],
+      };
+    });
 };

@@ -21,6 +21,13 @@
   --color-tag-unknown-bg:   #f3f4f6;
   --color-tag-unknown-text: #374151;
 
+  --color-tag-hygiene-bg:   #fef3c7;
+  --color-tag-hygiene-text: #92400e;
+  --color-tag-quality-bg:   #ede9fe;
+  --color-tag-quality-text: #4c1d95;
+  --color-tag-optional-bg:  #f3f4f6;
+  --color-tag-optional-text:#374151;
+
   --color-code-bg:          #1e1e2e;
   --color-code-text:        #cdd6f4;
 
@@ -185,6 +192,9 @@ button.tag.is-active {
 .tag--study    { background: var(--color-tag-study-bg);    color: var(--color-tag-study-text); }
 .tag--artifact { background: var(--color-tag-artifact-bg); color: var(--color-tag-artifact-text); }
 .tag--unknown  { background: var(--color-tag-unknown-bg);  color: var(--color-tag-unknown-text); }
+.tag--hygiene  { background: var(--color-tag-hygiene-bg);  color: var(--color-tag-hygiene-text); }
+.tag--quality  { background: var(--color-tag-quality-bg);  color: var(--color-tag-quality-text); }
+.tag--optional { background: var(--color-tag-optional-bg); color: var(--color-tag-optional-text); }
 
 .tag-list {
   display: flex;
@@ -374,6 +384,33 @@ button.tag.is-active {
 /* ── Links ───────────────────────────────────────────────────────────────── */
 a { color: var(--color-link); }
 a:hover { color: var(--color-link-hover); }
+
+/* ── Venue-required implementation highlight ─────────────────────────────── */
+.impl-details--venue-required {
+  border-color: var(--color-accent);
+}
+.impl-details--venue-required > .impl-summary {
+  background: #eff6ff;
+}
+
+/* ── Venue selector ─────────────────────────────────────────────────────── */
+.venue-group {
+  align-items: center;
+}
+.venue-select {
+  font: inherit;
+  font-size: 0.8rem;
+  padding: 0.2em 0.5em;
+  border: 1px solid var(--color-border);
+  border-radius: calc(var(--radius) - 2px);
+  background: var(--color-bg);
+  color: var(--color-text);
+  cursor: pointer;
+}
+.venue-select:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
 
 /* ── Filter status ───────────────────────────────────────────────────────── */
 .filter-status {

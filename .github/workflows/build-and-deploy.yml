@@ -24,7 +24,7 @@ jobs:
 
       - name: Download all release data from artifact-standards
         run: |
-          mkdir -p src/_data/versions
+          mkdir -p src/_data/versions src/_data/venues
           gh api repos/aaronpeikert/artifact-standards/releases \
             --paginate \
             --jq '.[].tag_name' | while read -r tag; do
@@ -32,7 +32,11 @@ jobs:
             curl -fsSL \
               "https://github.com/aaronpeikert/artifact-standards/releases/download/${tag}/data.yml" \
               -o "src/_data/versions/${tag}.yaml" \
-              || echo "Warning: failed to download ${tag}"
+              || echo "Warning: failed to download data for ${tag}"
+            curl -fsSL \
+              "https://github.com/aaronpeikert/artifact-standards/releases/download/${tag}/venues.yml" \
+              -o "src/_data/venues/${tag}.yaml" \
+              || echo "Warning: failed to download venues for ${tag}"
           done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

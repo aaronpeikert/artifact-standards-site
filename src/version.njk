@@ -8,8 +8,9 @@ layout: base.njk
 ---
 
 {% set d = version.data %}
+{% set venues = version.venues %}
 
-{% if d.study_tags or d.artifact_tags %}
+{% if d.study_tags or d.artifact_tags or venues.length %}
 <section class="tag-legend" aria-label="Filter by tag">
   <h2 class="sr-only">Filter</h2>
   {% if d.study_tags %}
@@ -34,6 +35,17 @@ layout: base.njk
     {% endfor %}
   </div>
   {% endif %}
+  {% if venues.length %}
+  <div class="tag-group venue-group">
+    <label class="tag-group-label" for="venue-select">Venue</label>
+    <select id="venue-select" class="venue-select">
+      <option value="">All venues</option>
+      {% for venue in venues %}
+      <option value="{{ venue.id | slugify }}">{{ venue.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  {% endif %}
   <p class="filter-status" id="filter-count" aria-live="polite"></p>
 </section>
 {% endif %}
@@ -43,7 +55,8 @@ layout: base.njk
   <article class="principle-card"
     id="principle-{{ principle.id | slugify }}"
     data-study="{{ principle.study_tags | tagSlugs }}"
-    data-artifact="{{ principle.artifact_tags | tagSlugs }}">
+    data-artifact="{{ principle.artifact_tags | tagSlugs }}"
+    data-impl-venues="{{ principle | principleImplVenues(venues) }}">
 
     <header class="principle-header">
       <h2 class="principle-name">
@@ -66,10 +79,15 @@ layout: base.njk
     {% if principle.implementations %}
     <div class="implementations">
       {% for impl in principle.implementations %}
-      <details class="impl-details" id="impl-{{ impl.id | slugify }}">
+      <details class="impl-details" id="impl-{{ impl.id | slugify }}"
+        data-required-by="{{ impl.id | requiredByVenues(venues) }}"
+        data-venue-names="{{ impl.id | venueDisplayNames(venues) }}">
         <summary class="impl-summary">
-          <span class="impl-name">{{ impl.name }}</span>
+          <span class="impl-name"><span class="impl-display-name">{{ impl.name }}</span></span>
           <span class="tag-list" aria-hidden="true">
+            {% if impl.check_level %}
+            <span class="tag tag--{{ impl.check_level }}" title="Check level: {{ impl.check_level }}">{{ impl.check_level }}</span>
+            {% endif %}
             {% for curie in (impl.study_tags or []) %}
               {% set tag = curie | tagById(d) %}
               <span class="tag tag--study">{{ tag.name }}</span>
