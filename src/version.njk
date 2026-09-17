@@ -10,15 +10,15 @@ layout: base.njk
 {% set d = version.data %}
 {% set venues = version.venues %}
 
-{% if d.study_tags or d.artifact_tags or venues.length %}
+{% if d.method_type_tags or d.artifact_tags or venues.length %}
 <section class="tag-legend" aria-label="Filter by tag">
   <h2 class="sr-only">Filter</h2>
-  {% if d.study_tags %}
+  {% if d.method_type_tags %}
   <div class="tag-group">
-    <span class="tag-group-label">Study type</span>
-    {% for tag in d.study_tags %}
-      <button class="tag tag--study"
-        data-filter-type="study"
+    <span class="tag-group-label">Method type</span>
+    {% for tag in d.method_type_tags %}
+      <button class="tag tag--method-type"
+        data-filter-type="method-type"
         data-filter-id="{{ tag.id | slugify }}"
         title="{{ tag.description | trim }}">{{ tag.name }}</button>
     {% endfor %}
@@ -54,7 +54,7 @@ layout: base.njk
   {% for principle in d.principles %}
   <article class="principle-card"
     id="principle-{{ principle.id | slugify }}"
-    data-study="{{ principle.study_tags | tagSlugs }}"
+    data-method-type="{{ principle.method_type_tags | tagSlugs }}"
     data-artifact="{{ principle.artifact_tags | tagSlugs }}"
     data-impl-venues="{{ principle | principleImplVenues(venues) }}">
 
@@ -63,9 +63,9 @@ layout: base.njk
         <a href="#principle-{{ principle.id | slugify }}" class="anchor-link">{{ principle.name | displayName }}</a>
       </h2>
       <div class="tag-list" aria-label="Applicable to">
-        {% for curie in (principle.study_tags or []) %}
+        {% for curie in (principle.method_type_tags or []) %}
           {% set tag = curie | tagById(d) %}
-          <span class="tag tag--study" title="{{ tag.description | trim if tag.description }}">{{ tag.name }}</span>
+          <span class="tag tag--method-type" title="{{ tag.description | trim if tag.description }}">{{ tag.name }}</span>
         {% endfor %}
         {% for curie in (principle.artifact_tags or []) %}
           {% set tag = curie | tagById(d) %}
@@ -88,9 +88,9 @@ layout: base.njk
             {% if impl.check_level %}
             <span class="tag tag--{{ impl.check_level }}" title="Check level: {{ impl.check_level }}">{{ impl.check_level }}</span>
             {% endif %}
-            {% for curie in (impl.study_tags or []) %}
+            {% for curie in (impl.method_type_tags or []) %}
               {% set tag = curie | tagById(d) %}
-              <span class="tag tag--study">{{ tag.name }}</span>
+              <span class="tag tag--method-type">{{ tag.name }}</span>
             {% endfor %}
             {% for curie in (impl.artifact_tags or []) %}
               {% set tag = curie | tagById(d) %}

@@ -14,8 +14,8 @@
   --color-link-hover:       #0d3d78;
   --color-accent:           #1a56a0;
 
-  --color-tag-study-bg:     #dbeafe;
-  --color-tag-study-text:   #1e3a5f;
+  --color-tag-method-type-bg:     #dbeafe;
+  --color-tag-method-type-text:   #1e3a5f;
   --color-tag-artifact-bg:  #dcfce7;
   --color-tag-artifact-text:#14532d;
   --color-tag-unknown-bg:   #f3f4f6;
@@ -189,7 +189,7 @@ button.tag.is-active {
   opacity: 0.45;
 }
 
-.tag--study    { background: var(--color-tag-study-bg);    color: var(--color-tag-study-text); }
+.tag--method-type    { background: var(--color-tag-method-type-bg);    color: var(--color-tag-method-type-text); }
 .tag--artifact { background: var(--color-tag-artifact-bg); color: var(--color-tag-artifact-text); }
 .tag--unknown  { background: var(--color-tag-unknown-bg);  color: var(--color-tag-unknown-text); }
 .tag--hygiene  { background: var(--color-tag-hygiene-bg);  color: var(--color-tag-hygiene-text); }
@@ -314,7 +314,7 @@ button.tag.is-active {
   margin-bottom: 0.75rem;
 }
 .check--automated { border-left-color: var(--color-accent); }
-.check--human     { border-left-color: var(--color-tag-study-text); }
+.check--human     { border-left-color: var(--color-tag-method-type-text); }
 
 .check-description { margin-bottom: 0.5rem; font-size: 0.9rem; }
 .expected-result   { font-size: 0.8rem; color: var(--color-text-muted); margin-top: 0.5rem; }

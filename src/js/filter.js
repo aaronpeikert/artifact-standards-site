@@ -5,7 +5,7 @@
 
   function getFilters() {
     return {
-      study: params.getAll("study"),
+      "method-type": params.getAll("method-type"),
       artifact: params.getAll("artifact"),
       venue: params.get("venue") || "",
     };
@@ -29,13 +29,13 @@
 
     // Show/hide principle cards
     cards.forEach(function (card) {
-      var studyTags = JSON.parse(card.dataset.study || "[]");
+      var methodTypeTags = JSON.parse(card.dataset.methodType || "[]");
       var artifactTags = JSON.parse(card.dataset.artifact || "[]");
       var implVenues = JSON.parse(card.dataset.implVenues || "[]");
 
-      var studyMatch =
-        filters.study.length === 0 ||
-        filters.study.some(function (f) { return studyTags.indexOf(f) !== -1; });
+      var methodTypeMatch =
+        filters["method-type"].length === 0 ||
+        filters["method-type"].some(function (f) { return methodTypeTags.indexOf(f) !== -1; });
       var artifactMatch =
         filters.artifact.length === 0 ||
         filters.artifact.some(function (f) { return artifactTags.indexOf(f) !== -1; });
@@ -43,7 +43,7 @@
         filters.venue === "" ||
         implVenues.indexOf(filters.venue) !== -1;
 
-      var show = studyMatch && artifactMatch && venueMatch;
+      var show = methodTypeMatch && artifactMatch && venueMatch;
       card.hidden = !show;
       if (show) visible++;
 
@@ -70,7 +70,7 @@
     var counter = document.getElementById("filter-count");
     if (counter) {
       var hasFilter =
-        filters.study.length > 0 ||
+        filters["method-type"].length > 0 ||
         filters.artifact.length > 0 ||
         filters.venue !== "";
       counter.textContent = hasFilter

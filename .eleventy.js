@@ -3,8 +3,8 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy("src/js");
 
   eleventyConfig.addFilter("tagById", function (curie, standards) {
-    const study = (standards.study_tags || []).find((t) => t.id === curie);
-    if (study) return { ...study, kind: "study" };
+    const study = (standards.method_type_tags || []).find((t) => t.id === curie);
+    if (study) return { ...study, kind: "method-type" };
     const artifact = (standards.artifact_tags || []).find((t) => t.id === curie);
     if (artifact) return { ...artifact, kind: "artifact" };
     return { id: curie, name: curie, kind: "unknown" };
