@@ -19,6 +19,7 @@ module.exports = function (eleventyConfig) {
   });
 
   return {
+    pathPrefix: "/artifact-standards-site/",
     dir: {
       input: "src",
       output: "public",
