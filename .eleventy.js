@@ -27,6 +27,11 @@ module.exports = function (eleventyConfig) {
     );
   });
 
+  // Strip the " — Generic" suffix used in data for semantic tagging
+  eleventyConfig.addFilter("displayName", function (name) {
+    return String(name).replace(/\s*—\s*Generic\s*$/i, "");
+  });
+
   function slugifyCurie(curie) {
     return String(curie).replace(/^[^:]+:/, "").replace(/[^a-z0-9-]/gi, "-").toLowerCase();
   }

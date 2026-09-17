@@ -60,7 +60,7 @@ layout: base.njk
 
     <header class="principle-header">
       <h2 class="principle-name">
-        <a href="#principle-{{ principle.id | slugify }}" class="anchor-link">{{ principle.name }}</a>
+        <a href="#principle-{{ principle.id | slugify }}" class="anchor-link">{{ principle.name | displayName }}</a>
       </h2>
       <div class="tag-list" aria-label="Applicable to">
         {% for curie in (principle.study_tags or []) %}
