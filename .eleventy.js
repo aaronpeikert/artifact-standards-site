@@ -36,11 +36,25 @@ module.exports = function (eleventyConfig) {
     return String(curie).replace(/^[^:]+:/, "").replace(/[^a-z0-9-]/gi, "-").toLowerCase();
   }
 
+  // All standard references of a venue: venue-wide ones (badge: null) and
+  // those required by each badge it offers.
+  function venueRefs(venue) {
+    const refs = (venue.required_standards || []).map((ref) => ({ ref, badge: null }));
+    (venue.badges || []).forEach((badge) => {
+      (badge.required_standards || []).forEach((ref) => refs.push({ ref, badge }));
+    });
+    return refs;
+  }
+
+  function refsFor(implId, venue) {
+    return venueRefs(venue).filter((r) => r.ref.standard === implId);
+  }
+
   // JSON array of venue slugs that require this implementation (standard)
   eleventyConfig.addFilter("requiredByVenues", function (implId, venues) {
     if (!venues || !venues.length) return "[]";
     const slugs = venues
-      .filter((v) => (v.required_standards || []).some((r) => r.standard === implId))
+      .filter((v) => refsFor(implId, v).length > 0)
       .map((v) => slugifyCurie(v.id));
     return JSON.stringify(slugs);
   });
@@ -50,10 +64,37 @@ module.exports = function (eleventyConfig) {
     if (!venues || !venues.length) return "{}";
     const result = {};
     venues.forEach((v) => {
-      const ref = (v.required_standards || []).find((r) => r.standard === implId);
-      if (ref && ref.display_name) {
-        result[slugifyCurie(v.id)] = ref.display_name;
-      }
+      const named = refsFor(implId, v).find((r) => r.ref.display_name);
+      if (named) result[slugifyCurie(v.id)] = named.ref.display_name;
+    });
+    return JSON.stringify(result);
+  });
+
+  // JSON object mapping venue slug → list of requirement contexts for this
+  // implementation: which badge (or all submissions) requires it, at which
+  // check level, for which artifact tags, with which note and parameters.
+  eleventyConfig.addFilter("venueRequirements", function (implId, venues, standards) {
+    if (!venues || !venues.length) return "{}";
+    const tagName = (curie) => {
+      const all = [...(standards.method_type_tags || []), ...(standards.artifact_tags || [])];
+      const tag = all.find((t) => t.id === curie);
+      return tag ? tag.name : curie;
+    };
+    const result = {};
+    venues.forEach((v) => {
+      const refs = refsFor(implId, v);
+      if (!refs.length) return;
+      result[slugifyCurie(v.id)] = refs.map(({ ref, badge }) => ({
+        scope: badge ? badge.name : "All submissions",
+        check_level: ref.check_level || null,
+        applies_to: (ref.applies_to_artifact_tags || []).map(tagName),
+        note: ref.note ? String(ref.note).trim() : null,
+        parameters: (ref.parameters || []).map((p) => ({
+          name: p.name,
+          value: String(p.value),
+          description: p.description || null,
+        })),
+      }));
     });
     return JSON.stringify(result);
   });
@@ -65,8 +106,8 @@ module.exports = function (eleventyConfig) {
     const implIds = new Set((principle.implementations || []).map((i) => i.id));
     const slugs = new Set();
     venues.forEach((v) => {
-      (v.required_standards || []).forEach((r) => {
-        if (implIds.has(r.standard)) slugs.add(slugifyCurie(v.id));
+      venueRefs(v).forEach(({ ref }) => {
+        if (implIds.has(ref.standard)) slugs.add(slugifyCurie(v.id));
       });
     });
     return JSON.stringify([...slugs]);

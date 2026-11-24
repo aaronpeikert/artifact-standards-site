@@ -28,6 +28,13 @@
   --color-tag-optional-bg:  #f3f4f6;
   --color-tag-optional-text:#374151;
 
+  --color-tag-scope-bg:     #e0f2fe;
+  --color-tag-scope-text:   #075985;
+  --color-tag-badge-bg:     #e0f2fe;
+  --color-tag-badge-text:   #075985;
+  --color-tag-award-bg:     #fce7f3;
+  --color-tag-award-text:   #9d174d;
+
   --color-code-bg:          #1e1e2e;
   --color-code-text:        #cdd6f4;
 
@@ -433,3 +440,40 @@ a:hover { color: var(--color-link-hover); }
   .tag-legend { flex-direction: column; }
   .impl-summary { flex-direction: column; align-items: flex-start; }
 }
+
+/* ── Venue badges and requirements ──────────────────────────────────────── */
+.tag--scope { background: var(--color-tag-scope-bg); color: var(--color-tag-scope-text); }
+.tag--badge { background: var(--color-tag-badge-bg); color: var(--color-tag-badge-text); }
+.tag--award { background: var(--color-tag-award-bg); color: var(--color-tag-award-text); }
+.venue-scope-tags { display: contents; }
+
+.venue-info {
+  background: var(--color-surface);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius);
+  padding: var(--gap);
+  margin-bottom: var(--gap);
+}
+.venue-info[hidden] { display: none; }
+.venue-info__title { font-size: 1.1rem; margin-bottom: 0.4rem; }
+.venue-info__description,
+.venue-info__policy { color: var(--color-text-muted); font-size: 0.9rem; }
+.venue-info__policy { margin-top: 0.75rem; word-break: break-word; }
+
+.badge-list {
+  list-style: none;
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.badge-item { font-size: 0.9rem; }
+.badge-item .tag { margin-right: 0.4rem; }
+.badge-item__description { color: var(--color-text-muted); }
+
+.venue-requirement { border-left-color: var(--color-tag-scope-text); }
+.venue-requirement__scope { font-size: 0.9rem; }
+.venue-requirement__note { font-size: 0.9rem; color: var(--color-text-muted); margin-top: 0.25rem; }
+.venue-requirement .evidence-list { margin-top: 0.25rem; }
+.venue-requirement code { font-family: var(--font-mono); font-size: 0.8rem; word-break: break-all; }
+.tag[hidden] { display: none; }

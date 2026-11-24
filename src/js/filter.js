@@ -47,7 +47,8 @@
       card.hidden = !show;
       if (show) visible++;
 
-      // Swap implementation display names and highlight venue-required impls
+      // Swap implementation display names, highlight venue-required impls,
+      // and show which badges of the venue require them
       card.querySelectorAll(".impl-details").forEach(function (details) {
         var requiredBy = JSON.parse(details.dataset.requiredBy || "[]");
         var venueNames = JSON.parse(details.dataset.venueNames || "{}");
@@ -63,7 +64,14 @@
           var venueName = filters.venue && venueNames[filters.venue];
           nameEl.textContent = venueName || nameEl.dataset.defaultName;
         }
+
+        renderVenueRequirements(details, isRequired ? venueReqs(details, filters.venue) : []);
       });
+    });
+
+    // Show the info panel of the selected venue
+    document.querySelectorAll("[data-venue-info]").forEach(function (panel) {
+      panel.hidden = panel.dataset.venueInfo !== filters.venue;
     });
 
     // Update status text
@@ -81,6 +89,65 @@
     // Show empty state
     var noResults = document.getElementById("no-results");
     if (noResults) noResults.hidden = visible > 0;
+  }
+
+  function venueReqs(details, venue) {
+    var all = JSON.parse(details.dataset.venueRequirements || "{}");
+    return all[venue] || [];
+  }
+
+  function el(tag, className, text) {
+    var node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text != null) node.textContent = text;
+    return node;
+  }
+
+  // Render badge chips in the summary and per-badge notes in the body.
+  function renderVenueRequirements(details, reqs) {
+    var chips = details.querySelector(".venue-scope-tags");
+    var section = details.querySelector(".venue-requirements");
+    var list = details.querySelector(".venue-requirements__list");
+    var levelTag = details.querySelector(".impl-check-level");
+    if (!chips || !section || !list) return;
+
+    chips.textContent = "";
+    list.textContent = "";
+    section.hidden = reqs.length === 0;
+    if (levelTag) levelTag.hidden = false;
+
+    reqs.forEach(function (req) {
+      chips.appendChild(el("span", "tag tag--scope", req.scope));
+
+      var item = el("div", "check venue-requirement");
+      var head = el("p", "venue-requirement__scope");
+      head.appendChild(el("strong", null, req.scope));
+      if (req.check_level) {
+        head.appendChild(document.createTextNode(" "));
+        head.appendChild(el("span", "tag tag--" + req.check_level, req.check_level));
+      }
+      if (req.applies_to.length) {
+        head.appendChild(document.createTextNode(" — only for: " + req.applies_to.join(", ")));
+      }
+      item.appendChild(head);
+      if (req.note) item.appendChild(el("p", "venue-requirement__note", req.note));
+      if (req.parameters.length) {
+        var params = el("ul", "evidence-list");
+        req.parameters.forEach(function (p) {
+          var li = el("li");
+          li.appendChild(el("code", null, p.name + " = " + p.value));
+          if (p.description) li.appendChild(document.createTextNode(" — " + p.description));
+          params.appendChild(li);
+        });
+        item.appendChild(params);
+      }
+      list.appendChild(item);
+    });
+
+    // A venue-specific check level replaces the generic one in the summary
+    var override = reqs.filter(function (r) { return r.check_level; })[0];
+    if (levelTag && override) levelTag.hidden = true;
+    if (override) chips.appendChild(el("span", "tag tag--" + override.check_level, override.check_level));
   }
 
   function toggleFilter(type, id) {

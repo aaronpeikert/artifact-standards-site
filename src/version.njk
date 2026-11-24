@@ -50,6 +50,34 @@ layout: base.njk
 </section>
 {% endif %}
 
+{% for venue in venues %}
+<section class="venue-info" data-venue-info="{{ venue.id | slugify }}" hidden aria-label="{{ venue.name }}">
+  <h2 class="venue-info__title">
+    {% if venue.url %}<a href="{{ venue.url }}">{{ venue.name }}</a>{% else %}{{ venue.name }}{% endif %}
+  </h2>
+  {% if venue.description %}<p class="venue-info__description">{{ venue.description | trim }}</p>{% endif %}
+  {% if venue.eligible_artifact_tags %}
+  <div class="tag-list" aria-label="Eligible artifact types">
+    {% for curie in venue.eligible_artifact_tags %}
+      {% set tag = curie | tagById(d) %}
+      <span class="tag tag--artifact">{{ tag.name }}</span>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% if venue.badges %}
+  <ul class="badge-list">
+    {% for badge in venue.badges %}
+    <li class="badge-item">
+      <span class="tag tag--{{ badge.kind or 'badge' }}">{{ badge.name }}</span>
+      {% if badge.description %}<span class="badge-item__description">{{ badge.description | trim }}</span>{% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% if venue.badging_policy %}<p class="venue-info__policy">Badges defined against <a href="{{ venue.badging_policy }}">{{ venue.badging_policy }}</a>.</p>{% endif %}
+</section>
+{% endfor %}
+
 <section aria-label="Principles">
   {% for principle in d.principles %}
   <article class="principle-card"
@@ -81,12 +109,14 @@ layout: base.njk
       {% for impl in principle.implementations %}
       <details class="impl-details" id="impl-{{ impl.id | slugify }}"
         data-required-by="{{ impl.id | requiredByVenues(venues) }}"
-        data-venue-names="{{ impl.id | venueDisplayNames(venues) }}">
+        data-venue-names="{{ impl.id | venueDisplayNames(venues) }}"
+        data-venue-requirements="{{ impl.id | venueRequirements(venues, d) }}">
         <summary class="impl-summary">
           <span class="impl-name"><span class="impl-display-name">{{ impl.name }}</span></span>
           <span class="tag-list" aria-hidden="true">
+            <span class="venue-scope-tags"></span>
             {% if impl.check_level %}
-            <span class="tag tag--{{ impl.check_level }}" title="Check level: {{ impl.check_level }}">{{ impl.check_level }}</span>
+            <span class="tag tag--{{ impl.check_level }} impl-check-level" title="Check level: {{ impl.check_level }}">{{ impl.check_level }}</span>
             {% endif %}
             {% for curie in (impl.method_type_tags or []) %}
               {% set tag = curie | tagById(d) %}
@@ -100,6 +130,11 @@ layout: base.njk
         </summary>
 
         <div class="impl-body">
+          <section class="guidance-section venue-requirements" hidden>
+            <h4>Venue requirements</h4>
+            <div class="venue-requirements__list"></div>
+          </section>
+
           <p class="impl-rationale">{{ impl.rationale | trim }}</p>
 
           <section class="guidance-section">
